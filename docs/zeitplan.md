@@ -51,7 +51,7 @@ gantt
     axisFormat  %d.%m.%y
     tickInterval 1w
 
-    section 1. Initialisierung
+    section 1. Initialisierung & Analyse
     Kickoff & Einarbeitung          :done, 16.02.2026, 23.02.2026
     Erstellung Lastenheft           :done, 24.02.2026, 19.03.2026
     Review 1                        :milestone, done, 20.03.2026, 0d

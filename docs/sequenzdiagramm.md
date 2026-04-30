@@ -43,37 +43,48 @@ Dieses Diagramm zeigt den Ablauf für einen Gelegenheitsnutzer. Es berücksichti
 ```mermaid
 sequenceDiagram
     actor GN as Gelegenheitsnutzer
-    participant UI as GUI (Simulation)
-    participant KA as Kassenlogik
+    participant Kasse as Kassenautomat (GUI)
+    participant KA as TarifRechner
+    participant ZS as Zahlsystem <<Schnittstelle>>
     participant T as Ticket
-    participant ZS as Zahlsystem (Schnittstelle)
+    participant Ausfahrt as Ausfahrtsterminal (GUI)
     participant S as Ausgangsschranke
 
-    Note over GN, S: Prozess: Bezahlung am Automaten
-    GN->>UI: Ticket in "Automaten" einführen
-    UI->>T: getEingangsZeit()
-    T-->>UI: Zeitstempel
-    UI->>KA: berechneTarif(eintritt, austritt)
+    Note over GN, S: Phase 1: Bezahlung am Automaten
+    GN->>Kasse: Ticketnummer eingeben / scannen
+    activate Kasse
+    Kasse->>T: getEingangsZeit()
+    T-->>Kasse: Zeitstempel
+    Kasse->>KA: berechneTarif(eintritt, austritt)
     Note right of KA: Logik: 15-Min-Takt & 24h-Pauschale
-    KA-->>UI: Betrag (z.B. CHF 12.50)
+    KA-->>Kasse: Geschuldeter Betrag
 
-    UI->>ZS: autorisiereZahlung(Betrag)
+    Kasse->>ZS: autorisiereZahlung(Betrag)
     activate ZS
-    ZS-->>UI: Zahlung erfolgreich
+    ZS-->>Kasse: Zahlung erfolgreich
     deactivate ZS
 
-    UI->>T: setBezahlt(true)
-    UI->>T: entwerten(aktuelleZeit)
-    UI-->>GN: Ticket ausgeben (visuell simuliert)
+    Kasse->>T: setBezahlt(true)
+    Kasse->>T: setAusgangsZeit(aktuelleZeit)
+    Kasse-->>GN: Austrittsticket ausgeben (visuell)
+    deactivate Kasse
 
-    Note over GN, S: Prozess: Ausfahrt an der Schranke
-    GN->>UI: Ticket an Schranke scannen
-    UI->>T: istBezahlt()
-    T-->>UI: true
-    UI->>S: oeffnen()
-    S-->>UI: Status: Offen
-    UI-->>GN: Anzeige: "Gute Fahrt"
-    UI->>S: schliessen()
+    Note over GN, S: Phase 2: Ausfahrt an der Schranke
+    GN->>Ausfahrt: Austrittsticket einführen
+    activate Ausfahrt
+    Ausfahrt->>T: istBezahlt()
+
+    alt Ticket ist bezahlt
+        T-->>Ausfahrt: true
+        Ausfahrt->>S: oeffnen()
+        S-->>Ausfahrt: Status: Offen
+        Ausfahrt-->>GN: Anzeige: "Gute Fahrt"
+        Ausfahrt->>S: schliessen()
+    else Ticket nicht bezahlt
+        T-->>Ausfahrt: false
+        Ausfahrt-->>GN: Fehler: "Bitte am Automaten nachzahlen" (NFA-20.1)
+    end
+    deactivate Ausfahrt
 ```
 
 ### Logik-Check: Der Tarif-Rechner (FA-40)
