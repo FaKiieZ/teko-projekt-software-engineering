@@ -131,10 +131,20 @@ public partial class MainViewModel : ObservableObject
     }
 
     [RelayCommand]
-    private void AdvanceTime()
+    private void AdvanceTime(string minutes)
     {
-        SimulatedTime = SimulatedTime.AddHours(1);
-        CurrentTicketInfo = $"Zeit vorgestellt auf {SimulatedTime:HH:mm}.";
+        if (int.TryParse(minutes, out int mins))
+        {
+            SimulatedTime = SimulatedTime.AddMinutes(mins);
+            CurrentTicketInfo = $"Zeit vorgestellt um {mins} Minuten auf {SimulatedTime:HH:mm}.";
+        }
+    }
+
+    [RelayCommand]
+    private void ResetTime()
+    {
+        SimulatedTime = DateTime.Now;
+        CurrentTicketInfo = "Zeit auf aktuelle Systemzeit zurückgesetzt.";
     }
 
     [RelayCommand]

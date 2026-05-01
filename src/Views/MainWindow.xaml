@@ -33,7 +33,20 @@
                 <TextBlock Text="Simulierte Zeit:" FontWeight="Bold" />
                 <TextBlock Text="{Binding SimulatedTime, StringFormat='dd.MM.yyyy HH:mm'}" Margin="0,0,0,8" FontSize="16"/>
                 
-                <Button Content="Zeit +1h" Command="{Binding AdvanceTimeCommand}" Margin="0,0,0,16"/>
+                <Grid Margin="0,0,0,16">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="*" />
+                    </Grid.ColumnDefinitions>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                    </Grid.RowDefinitions>
+                    
+                    <Button Grid.Row="0" Grid.Column="0" Content="+15m" Command="{Binding AdvanceTimeCommand}" CommandParameter="15" Margin="2" Style="{StaticResource MaterialDesignOutlinedButton}"/>
+                    <Button Grid.Row="0" Grid.Column="1" Content="+1h" Command="{Binding AdvanceTimeCommand}" CommandParameter="60" Margin="2" Style="{StaticResource MaterialDesignOutlinedButton}"/>
+                    <Button Grid.Row="1" Grid.ColumnSpan="2" Content="Reset auf Jetzt" Command="{Binding ResetTimeCommand}" Margin="2" Style="{StaticResource MaterialDesignFlatButton}"/>
+                </Grid>
 
                 <Button Content="Ticket lösen" Command="{Binding TakeTicketCommand}" Margin="0,0,0,8"/>
 
