@@ -6,14 +6,9 @@ using EasyParking.Models;
 
 namespace EasyParking.Services;
 
-public class TariffService
+public class TariffService(EasyParkingDbContext dbContext)
 {
-    private readonly EasyParkingDbContext _dbContext;
-
-    public TariffService(EasyParkingDbContext dbContext)
-    {
-        _dbContext = dbContext;
-    }
+    private readonly EasyParkingDbContext _dbContext = dbContext;
 
     public async Task<decimal> CalculateCostAsync(DateTime entryTime, DateTime exitTime)
     {

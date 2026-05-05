@@ -6,14 +6,9 @@ using EasyParking.Models;
 
 namespace EasyParking.Services;
 
-public class ParkingService
+public class ParkingService(EasyParkingDbContext dbContext)
 {
-    private readonly EasyParkingDbContext _dbContext;
-
-    public ParkingService(EasyParkingDbContext dbContext)
-    {
-        _dbContext = dbContext;
-    }
+    private readonly EasyParkingDbContext _dbContext = dbContext;
 
     public async Task<Ticket?> AssignFreeSpaceAsync(int? tenantId = null)
     {

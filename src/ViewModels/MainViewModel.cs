@@ -18,13 +18,54 @@ public partial class MainViewModel : ObservableObject
     private readonly TariffService _tariffService;
     private readonly System.Collections.Generic.Dictionary<int, DateTime> _paymentTimes = new();
 
-    [ObservableProperty]
     private DateTime _simulatedTime;
+    public DateTime SimulatedTime
+    {
+        get => _simulatedTime;
+        set
+        {
+            if (SetProperty(ref _simulatedTime, value))
+            {
+                OnPropertyChanged(nameof(SimulatedDate));
+                OnPropertyChanged(nameof(SimulatedTimeOnly));
+                TakeTicketCommand.NotifyCanExecuteChanged();
+                EnterTenantCommand.NotifyCanExecuteChanged();
+            }
+        }
+    }
+
+    public DateTime? SimulatedDate
+    {
+        get => SimulatedTime;
+        set
+        {
+            if (value.HasValue)
+            {
+                SimulatedTime = value.Value.Date + SimulatedTime.TimeOfDay;
+            }
+        }
+    }
+
+    public DateTime? SimulatedTimeOnly
+    {
+        get => SimulatedTime;
+        set
+        {
+            if (value.HasValue)
+            {
+                SimulatedTime = SimulatedTime.Date + value.Value.TimeOfDay;
+            }
+        }
+    }
 
     [ObservableProperty]
+    [NotifyCanExecuteChangedFor(nameof(TakeTicketCommand))]
+    [NotifyCanExecuteChangedFor(nameof(EnterTenantCommand))]
     private bool _entranceBarrierOpen;
 
     [ObservableProperty]
+    [NotifyCanExecuteChangedFor(nameof(ExitOccasionalCommand))]
+    [NotifyCanExecuteChangedFor(nameof(ExitTenantCommand))]
     private bool _exitBarrierOpen;
 
     [ObservableProperty]
@@ -51,6 +92,9 @@ public partial class MainViewModel : ObservableObject
     [ObservableProperty]
     private decimal _totalRevenue;
 
+    private bool CanEnter() => !EntranceBarrierOpen;
+    private bool CanExit() => !ExitBarrierOpen;
+
     public MainViewModel()
     {
         _dbContext = new EasyParkingDbContext();
@@ -73,7 +117,7 @@ public partial class MainViewModel : ObservableObject
             _dbContext.ParkingGarages.Add(garage);
             await _dbContext.SaveChangesAsync();
 
-            int[] floorSizes = { 15, 10, 5 };
+            int[] floorSizes = [15, 10, 5];
             for (int i = 1; i <= 3; i++)
             {
                 var floor = new Floor { Number = i, TotalSpaces = floorSizes[i - 1], ParkingGarageId = garage.Id };
@@ -147,7 +191,7 @@ public partial class MainViewModel : ObservableObject
         CurrentTicketInfo = "Zeit auf aktuelle Systemzeit zurückgesetzt.";
     }
 
-    [RelayCommand]
+    [RelayCommand(CanExecute = nameof(CanEnter))]
     private async Task TakeTicketAsync()
     {
         var ticket = await _parkingService.AssignFreeSpaceAsync();
@@ -166,7 +210,7 @@ public partial class MainViewModel : ObservableObject
         }
     }
 
-    [RelayCommand]
+    [RelayCommand(CanExecute = nameof(CanEnter))]
     private async Task EnterTenantAsync()
     {
         var tenant = await _dbContext.Customers.FirstOrDefaultAsync(c => c.Code == TenantCodeInput && c.CustomerType == CustomerType.Tenant);
@@ -253,7 +297,7 @@ public partial class MainViewModel : ObservableObject
         }
     }
 
-    [RelayCommand]
+    [RelayCommand(CanExecute = nameof(CanExit))]
     private async Task ExitOccasionalAsync()
     {
         if (SelectedTicketToExit != null)
@@ -293,7 +337,7 @@ public partial class MainViewModel : ObservableObject
         }
     }
 
-    [RelayCommand]
+    [RelayCommand(CanExecute = nameof(CanExit))]
     private async Task ExitTenantAsync()
     {
         var tenant = await _dbContext.Customers.FirstOrDefaultAsync(c => c.Code == TenantCodeInput && c.CustomerType == CustomerType.Tenant);
@@ -320,6 +364,52 @@ public partial class MainViewModel : ObservableObject
             CurrentTicketInfo = "Ungültiger Dauermieter-Code.";
         }
         TenantCodeInput = string.Empty;
+    }
+
+    [RelayCommand]
+    private async Task SelectParkingSpaceAsync(ParkingSpace space)
+    {
+        if (space == null) return;
+
+        var floor = Floors.FirstOrDefault(f => f.Id == space.FloorId);
+        if (floor == null) return;
+
+        if (space.IsOccupied)
+        {
+            var ticket = await _dbContext.Tickets
+                .Include(t => t.Customer)
+                .Where(t => t.FloorNumber == floor.Number && t.SpaceNumber == space.Number && t.ExitTime == null)
+                .OrderByDescending(t => t.EntryTime)
+                .FirstOrDefaultAsync();
+
+            if (ticket != null)
+            {
+                var duration = SimulatedTime - ticket.EntryTime;
+                string type = ticket.CustomerId != null ? "Dauermieter" : "Gelegenheitsnutzer";
+                string paidStatus = ticket.IsPaid ? "Bezahlt" : "Offen";
+                
+                CurrentTicketInfo = $"Parkplatz {floor.Number}.{space.Number} ({type})\n" +
+                                    $"Ticket ID: {ticket.Id}\n" +
+                                    $"Einfahrt: {ticket.EntryTime:dd.MM.yyyy HH:mm}\n" +
+                                    $"Dauer: {duration.Days}d {duration.Hours}h {duration.Minutes}m\n" +
+                                    $"Status: {paidStatus}";
+                
+                if (ticket.CustomerId == null && !ticket.IsPaid)
+                {
+                    var cost = await _tariffService.CalculateCostAsync(ticket.EntryTime, SimulatedTime);
+                    CurrentTicketInfo += $"\nAktuelle Kosten: CHF {cost:F2}";
+                }
+            }
+            else
+            {
+                CurrentTicketInfo = $"Parkplatz {floor.Number}.{space.Number} ist besetzt, aber kein Ticket gefunden.";
+            }
+        }
+        else
+        {
+            string status = space.AssignedTenantId != null ? $"Reserviert für Dauermieter (ID: {space.AssignedTenantId})" : "Frei";
+            CurrentTicketInfo = $"Parkplatz {floor.Number}.{space.Number}\nStatus: {status}";
+        }
     }
 
     private async Task OpenBarrierAsync(bool isEntrance)

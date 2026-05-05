@@ -30,8 +30,13 @@
         <md:Card Grid.Column="0" Margin="8" Padding="16">
             <StackPanel>
                 <TextBlock Text="Simulation Einfahrt" FontSize="18" FontWeight="Bold" Margin="0,0,0,16"/>
-                <TextBlock Text="Simulierte Zeit:" FontWeight="Bold" />
-                <TextBlock Text="{Binding SimulatedTime, StringFormat='dd.MM.yyyy HH:mm'}" Margin="0,0,0,8" FontSize="16"/>
+                <TextBlock Text="Simulierte Zeit:" FontWeight="Bold" Margin="0,0,0,8"/>
+                <DatePicker SelectedDate="{Binding SimulatedDate, UpdateSourceTrigger=PropertyChanged}" md:HintAssist.Hint="Datum wählen" Margin="0,0,0,4"/>
+                <md:TimePicker SelectedTime="{Binding SimulatedTimeOnly, UpdateSourceTrigger=PropertyChanged, StringFormat='HH:mm'}" 
+                               md:HintAssist.Hint="Zeit wählen" 
+                               Is24Hours="True" 
+                               SelectedTimeFormat="Long"
+                               Margin="0,0,0,12"/>
                 
                 <Grid Margin="0,0,0,16">
                     <Grid.ColumnDefinitions>
@@ -55,9 +60,10 @@
                 <Button Content="Einfahrt Dauermieter" Command="{Binding EnterTenantCommand}" Margin="0,0,0,16"/>
 
                 <TextBlock Text="Eingangsschranke:" FontWeight="Bold" Margin="0,8,0,4"/>
-                <Border Background="Red" Height="20" Width="80" HorizontalAlignment="Left">
+                <Border Height="20" Width="80" HorizontalAlignment="Left">
                     <Border.Style>
                         <Style TargetType="Border">
+                            <Setter Property="Background" Value="Red" />
                             <Style.Triggers>
                                 <DataTrigger Binding="{Binding EntranceBarrierOpen}" Value="True">
                                     <Setter Property="Background" Value="Green" />
@@ -101,7 +107,12 @@
                                         </ItemsControl.ItemsPanel>
                                         <ItemsControl.ItemTemplate>
                                             <DataTemplate>
-                                                <Border Width="40" Height="60" Margin="4" CornerRadius="4" BorderBrush="DarkGray" BorderThickness="1">
+                                                <Border Width="40" Height="60" Margin="4" CornerRadius="4" BorderBrush="DarkGray" BorderThickness="1" Cursor="Hand">
+                                                    <Border.InputBindings>
+                                                        <MouseBinding MouseAction="LeftClick" 
+                                                                      Command="{Binding DataContext.SelectParkingSpaceCommand, RelativeSource={RelativeSource AncestorType=Window}}" 
+                                                                      CommandParameter="{Binding}" />
+                                                    </Border.InputBindings>
                                                     <Border.Style>
                                                         <Style TargetType="Border">
                                                             <Setter Property="Background" Value="#F44336" /> <!-- Red (Tenant default) -->
@@ -152,9 +163,10 @@
                 <Button Content="Ausfahrt Dauermieter" Command="{Binding ExitTenantCommand}" Margin="0,0,0,16"/>
 
                 <TextBlock Text="Ausgangsschranke:" FontWeight="Bold" Margin="0,8,0,4"/>
-                <Border Background="Red" Height="20" Width="80" HorizontalAlignment="Left" Margin="0,0,0,16">
+                <Border Height="20" Width="80" HorizontalAlignment="Left" Margin="0,0,0,16">
                     <Border.Style>
                         <Style TargetType="Border">
+                            <Setter Property="Background" Value="Red" />
                             <Style.Triggers>
                                 <DataTrigger Binding="{Binding ExitBarrierOpen}" Value="True">
                                     <Setter Property="Background" Value="Green" />
