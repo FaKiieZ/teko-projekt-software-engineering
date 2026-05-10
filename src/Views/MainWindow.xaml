@@ -36,7 +36,7 @@
             <ColumnDefinition Width="*" />
         </Grid.ColumnDefinitions>
 
-        <!-- Sidebar Navigation -->
+        <!-- Sidebar Navigation (Seitenleiste) -->
         <Border Grid.Column="0" Background="{DynamicResource MaterialDesign.Brush.Primary}">
             <Grid>
                 <Grid.RowDefinitions>
@@ -133,10 +133,10 @@
             </Grid>
         </Border>
 
-        <!-- Main Content Area -->
+        <!-- Haupt-Inhaltsbereich -->
         <Grid Grid.Column="1" Margin="16">
             
-            <!-- Module 0: Dashboard (Simulation) -->
+            <!-- Modul 0: Dashboard (Simulation) -->
             <Grid>
                 <Grid.Style>
                     <Style TargetType="Grid">
@@ -156,7 +156,7 @@
                         <ColumnDefinition Width="1*" />
                     </Grid.ColumnDefinitions>
 
-                    <!-- Left Column: Entrance -->
+                    <!-- Linke Spalte: Einfahrt -->
                     <md:Card Grid.Column="0" Margin="8" Padding="16">
                         <StackPanel>
                             <TextBlock Text="Simulation Einfahrt" FontSize="18" FontWeight="Bold" Margin="0,0,0,16"/>
@@ -206,7 +206,7 @@
                         </StackPanel>
                     </md:Card>
 
-                    <!-- Center Column: Live Grid & Info -->
+                    <!-- Mittlere Spalte: Live-Raster & Info -->
                     <Grid Grid.Column="1" Margin="8">
                         <Grid.RowDefinitions>
                             <RowDefinition Height="Auto"/>
@@ -271,7 +271,7 @@
                         </ScrollViewer>
                     </Grid>
 
-                    <!-- Right Column: Exit & Payment -->
+                    <!-- Rechte Spalte: Ausfahrt & Bezahlung -->
                     <md:Card Grid.Column="2" Margin="8" Padding="16">
                         <StackPanel>
                             <TextBlock Text="Bezahlung &amp; Ausfahrt" FontSize="18" FontWeight="Bold" Margin="0,0,0,16"/>
@@ -311,7 +311,7 @@
                 </Grid>
             </Grid>
 
-            <!-- Module 1: Verwaltung (Placeholder) -->
+            <!-- Modul 1: Verwaltung (Platzhalter) -->
             <Grid>
                 <Grid.Style>
                     <Style TargetType="Grid">
@@ -334,7 +334,7 @@
                 </md:Card>
             </Grid>
 
-            <!-- Module 2: Reporting (Placeholder) -->
+            <!-- Modul 2: Reporting (Platzhalter) -->
             <Grid>
                 <Grid.Style>
                     <Style TargetType="Grid">
