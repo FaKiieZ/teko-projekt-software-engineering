@@ -90,6 +90,27 @@ public partial class MainViewModel : ObservableObject
     private Ticket? _selectedTicketToExit;
 
     [ObservableProperty]
+    private int _selectedModuleIndex = 0; // 0: Dashboard, 1: Verwaltung, 2: Reporting
+
+    [ObservableProperty]
+    private bool _isSidebarCollapsed = false;
+
+    [RelayCommand]
+    private void ToggleSidebar()
+    {
+        IsSidebarCollapsed = !IsSidebarCollapsed;
+    }
+
+    [RelayCommand]
+    private void SelectModule(string index)
+    {
+        if (int.TryParse(index, out int idx))
+        {
+            SelectedModuleIndex = idx;
+        }
+    }
+
+    [ObservableProperty]
     private decimal _totalRevenue;
 
     private bool CanEnter() => !EntranceBarrierOpen;
@@ -108,7 +129,7 @@ public partial class MainViewModel : ObservableObject
 
     private async void InitializeDatabaseAsync()
     {
-        await _dbContext.Database.EnsureDeletedAsync(); // Refresh for prototype to have a clean slate
+        await _dbContext.Database.EnsureDeletedAsync(); // Refresh für Prototyp, um eine saubere Ausgangslage zu haben
         await _dbContext.Database.EnsureCreatedAsync();
         
         if (!await _dbContext.Floors.AnyAsync())
@@ -128,7 +149,7 @@ public partial class MainViewModel : ObservableObject
                 _dbContext.Floors.Add(floor);
             }
 
-            // Seed a tenant
+            // Einen Dauermieter anlegen (Seeding)
             var tenant = new Customer { Code = "1234", CustomerType = CustomerType.Tenant, IsActive = true };
             _dbContext.Customers.Add(tenant);
             
@@ -238,30 +259,6 @@ public partial class MainViewModel : ObservableObject
         TenantCodeInput = string.Empty;
     }
 
-    [RelayCommand]
-    private async Task RegisterTenantAsync()
-    {
-        var freeSpace = await _dbContext.ParkingSpaces
-            .Include(ps => ps.Floor)
-            .FirstOrDefaultAsync(ps => ps.AssignedTenantId == null);
-
-        if (freeSpace == null)
-        {
-            CurrentTicketInfo = "Keine freien Parkplätze für neue Dauermieter verfügbar.";
-            return;
-        }
-
-        string generatedCode = new Random().Next(1000, 9999).ToString();
-        var customer = new Customer { Code = generatedCode, CustomerType = CustomerType.Tenant, IsActive = true };
-        _dbContext.Customers.Add(customer);
-        await _dbContext.SaveChangesAsync();
-
-        freeSpace.AssignedTenantId = customer.Id;
-        await _dbContext.SaveChangesAsync();
-
-        CurrentTicketInfo = $"Neuer Dauermieter erfolgreich registriert!\nPersönlicher Code: {customer.Code}\nZugewiesener Platz: Stockwerk {freeSpace.Floor?.Number}, Platz {freeSpace.Number}";
-        await LoadDataAsync();
-    }
 
     partial void OnSelectedTicketToPayChanged(Ticket? value)
     {

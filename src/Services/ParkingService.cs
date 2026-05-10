@@ -46,7 +46,7 @@ public class ParkingService(EasyParkingDbContext dbContext)
         }
 
         if (spaceToAssign == null || selectedFloor == null)
-            return null; // Garage full or no assigned space found
+            return null; // Parkhaus voll oder kein zugewiesener Platz gefunden
 
         spaceToAssign.IsOccupied = true;
 

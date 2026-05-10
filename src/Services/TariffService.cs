@@ -1,6 +1,3 @@
-using System;
-using System.Linq;
-using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using EasyParking.Models;
 
@@ -32,7 +29,7 @@ public class TariffService(EasyParkingDbContext dbContext)
             
             decimal dailyCost = CalculateDailyCost(dayStart, dayEnd, tariffs);
             
-            // Apply CHF 35 daily cap
+            // Tagespauschale von CHF 35 anwenden
             if (dailyCost > 35m)
                 dailyCost = 35m;
                 
@@ -44,20 +41,22 @@ public class TariffService(EasyParkingDbContext dbContext)
         return totalCost;
     }
 
-    private decimal CalculateDailyCost(DateTime start, DateTime end, System.Collections.Generic.List<Tariff> tariffs)
+    private decimal CalculateDailyCost(DateTime start, DateTime end, List<Tariff> tariffs)
     {
         decimal dailyCost = 0;
         DayType dayType = (start.DayOfWeek == DayOfWeek.Saturday || start.DayOfWeek == DayOfWeek.Sunday) ? DayType.Weekend : DayType.Weekday;
 
         var dailyTariffs = tariffs.Where(t => t.DayType == dayType).ToList();
 
-        // Calculate in 15-minute intervals
+        // Berechnung in 15-Minuten-Intervallen
         DateTime current = start;
         while (current < end)
         {
             TimeSpan currentTimeOfDay = current.TimeOfDay;
-            var applicableTariff = dailyTariffs.FirstOrDefault(t => t.StartTime <= currentTimeOfDay && (t.EndTime > currentTimeOfDay || t.EndTime == TimeSpan.FromHours(24)));
-            
+            var applicableTariff = dailyTariffs
+                .FirstOrDefault(t => t.StartTime <= currentTimeOfDay
+                    && (t.EndTime > currentTimeOfDay || t.EndTime == TimeSpan.FromHours(24)));
+
             if (applicableTariff != null)
             {
                 dailyCost += applicableTariff.RatePerHour / 4m;

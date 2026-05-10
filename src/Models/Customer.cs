@@ -6,12 +6,12 @@ public class Customer
 {
     public int Id { get; set; }
     
-    // Code for Dauermieter
+    // Code für Dauermieter
     public string? Code { get; set; }
     
     public CustomerType CustomerType { get; set; }
     
-    // For tenants to check if rent is paid
+    // Für Dauermieter zur Prüfung, ob die Miete bezahlt ist
     public bool IsActive { get; set; }
 
     public ICollection<ParkingSpace> ParkingSpaces { get; set; } = new List<ParkingSpace>();
