@@ -1,0 +1,362 @@
+<Window x:Class="EasyParking.Views.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:EasyParking.Views"
+        xmlns:viewmodels="clr-namespace:EasyParking.ViewModels"
+        xmlns:models="clr-namespace:EasyParking.Models"
+        xmlns:md="http://materialdesigninxaml.net/winfx/xaml/themes"
+        mc:Ignorable="d"
+        TextElement.Foreground="{DynamicResource MaterialDesignBody}"
+        TextElement.FontWeight="Regular"
+        TextElement.FontSize="13"
+        TextOptions.TextFormattingMode="Ideal"
+        TextOptions.TextRenderingMode="Auto"
+        Background="{DynamicResource MaterialDesignPaper}"
+        FontFamily="{DynamicResource MaterialDesignFont}"
+        Title="EasyParking Simulator" Height="650" Width="1000">
+    <Window.DataContext>
+        <viewmodels:MainViewModel />
+    </Window.DataContext>
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition>
+                <ColumnDefinition.Style>
+                    <Style TargetType="ColumnDefinition">
+                        <Setter Property="Width" Value="200" />
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding IsSidebarCollapsed}" Value="True">
+                                <Setter Property="Width" Value="60" />
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </ColumnDefinition.Style>
+            </ColumnDefinition>
+            <ColumnDefinition Width="*" />
+        </Grid.ColumnDefinitions>
+
+        <!-- Sidebar Navigation (Seitenleiste) -->
+        <Border Grid.Column="0" Background="{DynamicResource MaterialDesign.Brush.Primary}">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="*" />
+                </Grid.RowDefinitions>
+
+                <StackPanel Grid.Row="0" Margin="0,16">
+                    <Button Command="{Binding ToggleSidebarCommand}" 
+                            Style="{DynamicResource MaterialDesignIconButton}" 
+                            Foreground="{DynamicResource MaterialDesign.Brush.Primary.Foreground}"
+                            HorizontalAlignment="Right" Margin="8,0">
+                        <md:PackIcon Kind="Menu" />
+                    </Button>
+                    
+                    <TextBlock Text="EasyParking" Foreground="{DynamicResource MaterialDesign.Brush.Primary.Foreground}" 
+                               FontSize="20" FontWeight="Bold" Margin="0,16,0,32" HorizontalAlignment="Center">
+                        <TextBlock.Style>
+                            <Style TargetType="TextBlock" BasedOn="{StaticResource {x:Type TextBlock}}">
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding IsSidebarCollapsed}" Value="True">
+                                        <Setter Property="Visibility" Value="Collapsed" />
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </TextBlock.Style>
+                    </TextBlock>
+                </StackPanel>
+
+                <StackPanel Grid.Row="1">
+                    <Button Command="{Binding SelectModuleCommand}" CommandParameter="0"
+                            Style="{DynamicResource MaterialDesignFlatButton}" 
+                            Foreground="White"
+                            HorizontalContentAlignment="Left"
+                            Padding="12,8" Margin="4,2">
+                        <StackPanel Orientation="Horizontal">
+                            <md:PackIcon Kind="ViewDashboard" Width="24" Height="24" VerticalAlignment="Center" Margin="0,0,12,0"/>
+                            <TextBlock Text="DASHBOARD" VerticalAlignment="Center">
+                                <TextBlock.Style>
+                                    <Style TargetType="TextBlock" BasedOn="{StaticResource {x:Type TextBlock}}">
+                                        <Style.Triggers>
+                                            <DataTrigger Binding="{Binding IsSidebarCollapsed}" Value="True">
+                                                <Setter Property="Visibility" Value="Collapsed" />
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </TextBlock.Style>
+                            </TextBlock>
+                        </StackPanel>
+                    </Button>
+                    
+                    <Button Command="{Binding SelectModuleCommand}" CommandParameter="1"
+                            Style="{DynamicResource MaterialDesignFlatButton}" 
+                            Foreground="White"
+                            HorizontalContentAlignment="Left"
+                            Padding="12,8" Margin="4,2">
+                        <StackPanel Orientation="Horizontal">
+                            <md:PackIcon Kind="Settings" Width="24" Height="24" VerticalAlignment="Center" Margin="0,0,12,0"/>
+                            <TextBlock Text="VERWALTUNG" VerticalAlignment="Center">
+                                <TextBlock.Style>
+                                    <Style TargetType="TextBlock" BasedOn="{StaticResource {x:Type TextBlock}}">
+                                        <Style.Triggers>
+                                            <DataTrigger Binding="{Binding IsSidebarCollapsed}" Value="True">
+                                                <Setter Property="Visibility" Value="Collapsed" />
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </TextBlock.Style>
+                            </TextBlock>
+                        </StackPanel>
+                    </Button>
+                    
+                    <Button Command="{Binding SelectModuleCommand}" CommandParameter="2"
+                            Style="{DynamicResource MaterialDesignFlatButton}" 
+                            Foreground="White"
+                            HorizontalContentAlignment="Left"
+                            Padding="12,8" Margin="4,2">
+                        <StackPanel Orientation="Horizontal">
+                            <md:PackIcon Kind="ChartBar" Width="24" Height="24" VerticalAlignment="Center" Margin="0,0,12,0"/>
+                            <TextBlock Text="REPORTING" VerticalAlignment="Center">
+                                <TextBlock.Style>
+                                    <Style TargetType="TextBlock" BasedOn="{StaticResource {x:Type TextBlock}}">
+                                        <Style.Triggers>
+                                            <DataTrigger Binding="{Binding IsSidebarCollapsed}" Value="True">
+                                                <Setter Property="Visibility" Value="Collapsed" />
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </TextBlock.Style>
+                            </TextBlock>
+                        </StackPanel>
+                    </Button>
+                </StackPanel>
+            </Grid>
+        </Border>
+
+        <!-- Haupt-Inhaltsbereich -->
+        <Grid Grid.Column="1" Margin="16">
+            
+            <!-- Modul 0: Dashboard (Simulation) -->
+            <Grid>
+                <Grid.Style>
+                    <Style TargetType="Grid">
+                        <Setter Property="Visibility" Value="Collapsed" />
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding SelectedModuleIndex}" Value="0">
+                                <Setter Property="Visibility" Value="Visible" />
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </Grid.Style>
+                
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="1*" />
+                        <ColumnDefinition Width="2*" />
+                        <ColumnDefinition Width="1*" />
+                    </Grid.ColumnDefinitions>
+
+                    <!-- Linke Spalte: Einfahrt -->
+                    <md:Card Grid.Column="0" Margin="8" Padding="16">
+                        <StackPanel>
+                            <TextBlock Text="Simulation Einfahrt" FontSize="18" FontWeight="Bold" Margin="0,0,0,16"/>
+                            <TextBlock Text="Simulierte Zeit:" FontWeight="Bold" Margin="0,0,0,8"/>
+                            <DatePicker SelectedDate="{Binding SimulatedDate, UpdateSourceTrigger=PropertyChanged}" md:HintAssist.Hint="Datum wählen" Margin="0,0,0,4"/>
+                            <md:TimePicker SelectedTime="{Binding SimulatedTimeOnly, UpdateSourceTrigger=PropertyChanged, StringFormat='HH:mm'}" 
+                                           md:HintAssist.Hint="Zeit wählen" 
+                                           Is24Hours="True" 
+                                           SelectedTimeFormat="Long"
+                                           Margin="0,0,0,12"/>
+                            
+                            <Grid Margin="0,0,0,16">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="*" />
+                                </Grid.ColumnDefinitions>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="Auto" />
+                                    <RowDefinition Height="Auto" />
+                                </Grid.RowDefinitions>
+                                
+                                <Button Grid.Row="0" Grid.Column="0" Content="+15m" Command="{Binding AdvanceTimeCommand}" CommandParameter="15" Margin="2" Style="{DynamicResource MaterialDesignOutlinedButton}"/>
+                                <Button Grid.Row="0" Grid.Column="1" Content="+1h" Command="{Binding AdvanceTimeCommand}" CommandParameter="60" Margin="2" Style="{DynamicResource MaterialDesignOutlinedButton}"/>
+                                <Button Grid.Row="1" Grid.ColumnSpan="2" Content="Reset auf Jetzt" Command="{Binding ResetTimeCommand}" Margin="2" Style="{DynamicResource MaterialDesignOutlinedButton}"/>
+                            </Grid>
+
+                            <Button Content="Ticket lösen" Command="{Binding TakeTicketCommand}" Style="{DynamicResource MaterialDesignRaisedButton}" Margin="0,0,0,8"/>
+
+                            <TextBlock Text="Dauermieter Einfahrt:" FontWeight="Bold" Margin="0,8,0,4"/>
+                            <TextBox Text="{Binding TenantCodeInput}" md:HintAssist.Hint="Code Dauermieter" Margin="0,0,0,8"/>
+                            <Button Content="Einfahrt Dauermieter" Command="{Binding EnterTenantCommand}" Style="{DynamicResource MaterialDesignRaisedButton}" Margin="0,0,0,16"/>
+
+                            <TextBlock Text="Eingangsschranke:" FontWeight="Bold" Margin="0,8,0,4"/>
+                            <Border Height="20" Width="80" HorizontalAlignment="Left">
+                                <Border.Style>
+                                    <Style TargetType="Border">
+                                        <Setter Property="Background" Value="Red" />
+                                        <Style.Triggers>
+                                            <DataTrigger Binding="{Binding EntranceBarrierOpen}" Value="True">
+                                                <Setter Property="Background" Value="Green" />
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </Border.Style>
+                            </Border>
+
+                        </StackPanel>
+                    </md:Card>
+
+                    <!-- Mittlere Spalte: Live-Raster & Info -->
+                    <Grid Grid.Column="1" Margin="8">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="*"/>
+                        </Grid.RowDefinitions>
+
+                        <md:Card Grid.Row="0" Margin="0,0,0,16" Padding="16">
+                            <StackPanel>
+                                <TextBlock Text="Aktuelle Ticket-Info:" FontSize="14" FontWeight="SemiBold" Opacity="0.8"/>
+                                <TextBlock Text="{Binding CurrentTicketInfo}" FontSize="16" TextWrapping="Wrap" Margin="0,8,0,0"/>
+                            </StackPanel>
+                        </md:Card>
+
+                        <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto">
+                            <ItemsControl ItemsSource="{Binding Floors}">
+                                <ItemsControl.ItemTemplate>
+                                    <DataTemplate>
+                                        <md:Card Margin="0,0,0,16" Padding="16">
+                                            <StackPanel>
+                                                <TextBlock Text="{Binding Number, StringFormat='Stockwerk {0}'}" FontSize="16" FontWeight="Bold" Margin="0,0,0,8"/>
+                                                <ItemsControl ItemsSource="{Binding ParkingSpaces}">
+                                                    <ItemsControl.ItemsPanel>
+                                                        <ItemsPanelTemplate>
+                                                            <WrapPanel />
+                                                        </ItemsPanelTemplate>
+                                                    </ItemsControl.ItemsPanel>
+                                                    <ItemsControl.ItemTemplate>
+                                                        <DataTemplate>
+                                                            <Border Width="40" Height="60" Margin="4" CornerRadius="4" BorderBrush="DarkGray" BorderThickness="1" Cursor="Hand">
+                                                                <Border.InputBindings>
+                                                                    <MouseBinding MouseAction="LeftClick" 
+                                                                                  Command="{Binding DataContext.SelectParkingSpaceCommand, RelativeSource={RelativeSource AncestorType=Window}}" 
+                                                                                  CommandParameter="{Binding}" />
+                                                                </Border.InputBindings>
+                                                                <Border.Style>
+                                                                    <Style TargetType="Border">
+                                                                        <Setter Property="Background" Value="#F44336" /> <!-- Rot: Dauermieter (fest zugewiesen) -->
+                                                                        <Style.Triggers>
+                                                                            <DataTrigger Binding="{Binding AssignedTenantId}" Value="{x:Null}">
+                                                                                <Setter Property="Background" Value="#4CAF50" /> <!-- Grün: Frei für Gelegenheitsnutzer -->
+                                                                            </DataTrigger>
+                                                                            <MultiDataTrigger>
+                                                                                <MultiDataTrigger.Conditions>
+                                                                                    <Condition Binding="{Binding IsOccupied}" Value="True" />
+                                                                                    <Condition Binding="{Binding AssignedTenantId}" Value="{x:Null}" />
+                                                                                </MultiDataTrigger.Conditions>
+                                                                                <Setter Property="Background" Value="#2196F3" /> <!-- Blau: Besetzt durch Gelegenheitsnutzer -->
+                                                                            </MultiDataTrigger>
+                                                                        </Style.Triggers>
+                                                                    </Style>
+                                                                </Border.Style>
+                                                                <TextBlock Text="{Binding Number}" HorizontalAlignment="Center" VerticalAlignment="Center" Foreground="White" FontWeight="Bold"/>
+                                                            </Border>
+                                                        </DataTemplate>
+                                                    </ItemsControl.ItemTemplate>
+                                                </ItemsControl>
+                                            </StackPanel>
+                                        </md:Card>
+                                    </DataTemplate>
+                                </ItemsControl.ItemTemplate>
+                            </ItemsControl>
+                        </ScrollViewer>
+                    </Grid>
+
+                    <!-- Rechte Spalte: Ausfahrt & Bezahlung -->
+                    <md:Card Grid.Column="2" Margin="8" Padding="16">
+                        <StackPanel>
+                            <TextBlock Text="Bezahlung &amp; Ausfahrt" FontSize="18" FontWeight="Bold" Margin="0,0,0,16"/>
+
+                            <TextBlock Text="Ticket bezahlen:" FontWeight="Bold"/>
+                            <ComboBox ItemsSource="{Binding UnpaidTickets}" SelectedItem="{Binding SelectedTicketToPay}" 
+                                      md:HintAssist.Hint="Ticket auswählen" DisplayMemberPath="Id" Margin="0,0,0,8"/>
+                            <Button Content="Ticket bezahlen" Command="{Binding PayTicketCommand}" Style="{DynamicResource MaterialDesignRaisedButton}" Margin="0,0,0,16"/>
+
+                            <TextBlock Text="Ticket an Ausfahrt scannen:" FontWeight="Bold"/>
+                            <ComboBox ItemsSource="{Binding ActiveTickets}" SelectedItem="{Binding SelectedTicketToExit}" 
+                                      md:HintAssist.Hint="Ticket auswählen" DisplayMemberPath="Id" Margin="0,0,0,8"/>
+                            <Button Content="Ausfahrt (Gelegenheitsnutzer)" Command="{Binding ExitOccasionalCommand}" Style="{DynamicResource MaterialDesignRaisedButton}" Margin="0,0,0,16"/>
+
+                            <TextBlock Text="Dauermieter Ausfahrt:" FontWeight="Bold" Margin="0,8,0,4"/>
+                            <TextBox Text="{Binding TenantCodeInput}" md:HintAssist.Hint="Code Dauermieter" Margin="0,0,0,8"/>
+                            <Button Content="Ausfahrt Dauermieter" Command="{Binding ExitTenantCommand}" Style="{DynamicResource MaterialDesignRaisedButton}" Margin="0,0,0,16"/>
+
+                            <TextBlock Text="Ausgangsschranke:" FontWeight="Bold" Margin="0,8,0,4"/>
+                            <Border Height="20" Width="80" HorizontalAlignment="Left" Margin="0,0,0,16">
+                                <Border.Style>
+                                    <Style TargetType="Border">
+                                        <Setter Property="Background" Value="Red" />
+                                        <Style.Triggers>
+                                            <DataTrigger Binding="{Binding ExitBarrierOpen}" Value="True">
+                                                <Setter Property="Background" Value="Green" />
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </Border.Style>
+                            </Border>
+
+                            <TextBlock Text="Gesamtumsatz:" FontWeight="Bold" Margin="0,16,0,4"/>
+                            <TextBlock Text="{Binding TotalRevenue, StringFormat='CHF {0:F2}'}" FontSize="16" Foreground="Green" FontWeight="Bold"/>
+                        </StackPanel>
+                    </md:Card>
+                </Grid>
+            </Grid>
+
+            <!-- Modul 1: Verwaltung (Platzhalter) -->
+            <Grid>
+                <Grid.Style>
+                    <Style TargetType="Grid">
+                        <Setter Property="Visibility" Value="Collapsed" />
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding SelectedModuleIndex}" Value="1">
+                                <Setter Property="Visibility" Value="Visible" />
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </Grid.Style>
+                <md:Card Padding="32">
+                    <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center">
+                        <md:PackIcon Kind="Settings" Width="64" Height="64" HorizontalAlignment="Center" Opacity="0.5"/>
+                        <TextBlock Text="Modul: Parkhaus-Verwaltung" FontSize="24" FontWeight="Bold" Margin="0,16,0,8"/>
+                        <TextBlock Text="Hier werden in der finalen Version die Parkhaus-Struktur, Tarife und Dauermieter-Abonnements konfiguriert." 
+                                   TextWrapping="Wrap" TextAlignment="Center" Opacity="0.7" MaxWidth="400"/>
+                        <TextBlock Text="(Konzeptionell dokumentiert in Kapitel 2.13.5)" Margin="0,32,0,0" FontStyle="Italic" HorizontalAlignment="Center"/>
+                    </StackPanel>
+                </md:Card>
+            </Grid>
+
+            <!-- Modul 2: Reporting (Platzhalter) -->
+            <Grid>
+                <Grid.Style>
+                    <Style TargetType="Grid">
+                        <Setter Property="Visibility" Value="Collapsed" />
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding SelectedModuleIndex}" Value="2">
+                                <Setter Property="Visibility" Value="Visible" />
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </Grid.Style>
+                <md:Card Padding="32">
+                    <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center">
+                        <md:PackIcon Kind="ChartBar" Width="64" Height="64" HorizontalAlignment="Center" Opacity="0.5"/>
+                        <TextBlock Text="Modul: Reporting und Auswertungen" FontSize="24" FontWeight="Bold" Margin="0,16,0,8"/>
+                        <TextBlock Text="Dieses Modul visualisiert die Einnahmen pro Parkhaus, Monat und Kundenkategorie in grafischer Form." 
+                                   TextWrapping="Wrap" TextAlignment="Center" Opacity="0.7" MaxWidth="400"/>
+                        <TextBlock Text="(Konzeptionell dokumentiert in Kapitel 2.13.5)" Margin="0,32,0,0" FontStyle="Italic" HorizontalAlignment="Center"/>
+                    </StackPanel>
+                </md:Card>
+            </Grid>
+
+        </Grid>
+    </Grid>
+</Window>
