@@ -12,31 +12,31 @@ public class TariffService(EasyParkingDbContext dbContext)
         if (exitTime <= entryTime)
             return 0;
 
-        if ((exitTime - entryTime).TotalHours > 24)
+        TimeSpan duration = exitTime - entryTime;
+
+        if (duration.TotalHours > 24)
         {
-            return Math.Ceiling((decimal)(exitTime - entryTime).TotalDays) * 35m;
+            // Ab 24 Stunden gilt die Tagespauschale pro angebrochenem Tag
+            return Math.Ceiling((decimal)duration.TotalDays) * 35m;
         }
 
         var tariffs = await _dbContext.Tariffs.ToListAsync();
         
         decimal totalCost = 0;
-        DateTime currentDay = entryTime.Date;
+        DateTime current = entryTime;
 
-        while (currentDay <= exitTime.Date)
+        while (current < exitTime)
         {
-            DateTime dayStart = currentDay == entryTime.Date ? entryTime : currentDay;
-            DateTime dayEnd = currentDay == exitTime.Date ? exitTime : currentDay.AddDays(1);
+            DateTime nextDay = current.Date.AddDays(1);
+            DateTime segmentEnd = nextDay < exitTime ? nextDay : exitTime;
             
-            decimal dailyCost = CalculateDailyCost(dayStart, dayEnd, tariffs);
-            
-            // Tagespauschale von CHF 35 anwenden
-            if (dailyCost > 35m)
-                dailyCost = 35m;
-                
-            totalCost += dailyCost;
-            
-            currentDay = currentDay.AddDays(1);
+            totalCost += CalculateDailyCost(current, segmentEnd, tariffs);
+            current = segmentEnd;
         }
+
+        // Bei einer Dauer bis 24 Stunden wird der Gesamtbetrag auf 35.00 begrenzt
+        if (totalCost > 35m)
+            totalCost = 35m;
 
         return totalCost;
     }

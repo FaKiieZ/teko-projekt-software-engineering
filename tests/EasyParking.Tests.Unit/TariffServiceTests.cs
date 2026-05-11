@@ -111,6 +111,19 @@ public class TariffServiceTests : IDisposable
         Assert.Equal(70.00m, cost);
     }
 
+    [Fact]
+    public async Task CalculateCostAsync_ShouldNotExceed35_WhenDurationIsExactly24HoursAcrossTwoDays()
+    {
+        // Montag 12:00 bis Dienstag 12:00 -> Genau 24 Stunden
+        // Die Kosten sollten bei 35.00 gedeckelt sein, auch wenn sie über zwei Kalendertage anfallen.
+        var entry = new DateTime(2026, 5, 4, 12, 0, 0);
+        var exit = entry.AddDays(1);
+
+        var cost = await _service.CalculateCostAsync(entry, exit);
+
+        Assert.Equal(35.00m, cost);
+    }
+
     public void Dispose()
     {
         _context.Database.EnsureDeleted();
