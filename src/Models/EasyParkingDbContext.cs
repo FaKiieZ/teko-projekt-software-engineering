@@ -23,23 +23,24 @@ public class EasyParkingDbContext : DbContext
             optionsBuilder.UseSqlite("Data Source=easyparking.db");
         }
     }
-// Standard-Tarife gemäss Anforderungen initial befüllen
-protected override void OnModelCreating(ModelBuilder modelBuilder)
-{
-    base.OnModelCreating(modelBuilder);
 
-    modelBuilder.Entity<Tariff>().HasData([
-        // Werktag-Tarife
-        new Tariff { Id = 1, DayType = DayType.Weekday, StartTime = new TimeSpan(0, 0, 0), EndTime = new TimeSpan(6, 0, 0), RatePerHour = 2.50m },
-        new Tariff { Id = 2, DayType = DayType.Weekday, StartTime = new TimeSpan(6, 0, 0), EndTime = new TimeSpan(9, 0, 0), RatePerHour = 2.80m },
-        new Tariff { Id = 3, DayType = DayType.Weekday, StartTime = new TimeSpan(9, 0, 0), EndTime = new TimeSpan(18, 0, 0), RatePerHour = 3.60m },
-        new Tariff { Id = 4, DayType = DayType.Weekday, StartTime = new TimeSpan(18, 0, 0), EndTime = new TimeSpan(21, 0, 0), RatePerHour = 2.80m },
-        new Tariff { Id = 5, DayType = DayType.Weekday, StartTime = new TimeSpan(21, 0, 0), EndTime = new TimeSpan(24, 0, 0), RatePerHour = 2.40m },
+    // Standard-Tarife gemäss Anforderungen initial befüllen
+    protected override void OnModelCreating(ModelBuilder modelBuilder)
+    {
+        base.OnModelCreating(modelBuilder);
 
-        // Wochenend-Tarife
-        new Tariff { Id = 6, DayType = DayType.Weekend, StartTime = new TimeSpan(0, 0, 0), EndTime = new TimeSpan(9, 0, 0), RatePerHour = 2.40m },
-        new Tariff { Id = 7, DayType = DayType.Weekend, StartTime = new TimeSpan(9, 0, 0), EndTime = new TimeSpan(18, 0, 0), RatePerHour = 3.20m },
-        new Tariff { Id = 8, DayType = DayType.Weekend, StartTime = new TimeSpan(18, 0, 0), EndTime = new TimeSpan(24, 0, 0), RatePerHour = 2.40m }
-    ]);
-}
+        modelBuilder.Entity<Tariff>().HasData([
+            // Werktag-Tarife
+            new Tariff { Id = 1, DayType = DayType.Weekday, StartTime = new TimeSpan(0, 0, 0), EndTime = new TimeSpan(6, 0, 0), RatePerHour = 2.50m },
+            new Tariff { Id = 2, DayType = DayType.Weekday, StartTime = new TimeSpan(6, 0, 0), EndTime = new TimeSpan(9, 0, 0), RatePerHour = 2.80m },
+            new Tariff { Id = 3, DayType = DayType.Weekday, StartTime = new TimeSpan(9, 0, 0), EndTime = new TimeSpan(18, 0, 0), RatePerHour = 3.60m },
+            new Tariff { Id = 4, DayType = DayType.Weekday, StartTime = new TimeSpan(18, 0, 0), EndTime = new TimeSpan(21, 0, 0), RatePerHour = 2.80m },
+            new Tariff { Id = 5, DayType = DayType.Weekday, StartTime = new TimeSpan(21, 0, 0), EndTime = new TimeSpan(24, 0, 0), RatePerHour = 2.40m },
+
+            // Wochenend-Tarife
+            new Tariff { Id = 6, DayType = DayType.Weekend, StartTime = new TimeSpan(0, 0, 0), EndTime = new TimeSpan(9, 0, 0), RatePerHour = 2.40m },
+            new Tariff { Id = 7, DayType = DayType.Weekend, StartTime = new TimeSpan(9, 0, 0), EndTime = new TimeSpan(18, 0, 0), RatePerHour = 3.20m },
+            new Tariff { Id = 8, DayType = DayType.Weekend, StartTime = new TimeSpan(18, 0, 0), EndTime = new TimeSpan(24, 0, 0), RatePerHour = 2.40m }
+        ]);
+    }
 }

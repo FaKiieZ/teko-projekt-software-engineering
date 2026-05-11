@@ -1,12 +1,9 @@
-using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
 using EasyParking.Models;
 using EasyParking.Services;
 using Microsoft.EntityFrameworkCore;
 using Xunit;
 
-namespace EasyParking.Tests;
+namespace EasyParking.Tests.Unit;
 
 public class TariffServiceTests : IDisposable
 {
@@ -42,7 +39,7 @@ public class TariffServiceTests : IDisposable
     [Fact]
     public async Task CalculateCostAsync_ShouldReturnZero_WhenExitTimeBeforeEntryTime()
     {
-        var entry = new DateTime(2026, 5, 4, 10, 0, 0); // Monday
+        var entry = new DateTime(2026, 5, 4, 10, 0, 0); // Montag
         var exit = entry.AddHours(-1);
 
         var cost = await _service.CalculateCostAsync(entry, exit);
@@ -53,7 +50,7 @@ public class TariffServiceTests : IDisposable
     [Fact]
     public async Task CalculateCostAsync_ShouldCalculateSimpleWeekdayTariff()
     {
-        // Monday 10:00 to 11:00 -> Tariff 3 (3.60/h)
+        // Montag 10:00 bis 11:00 -> Tarif 3 (3.60/h)
         var entry = new DateTime(2026, 5, 4, 10, 0, 0);
         var exit = entry.AddHours(1);
 
@@ -65,10 +62,10 @@ public class TariffServiceTests : IDisposable
     [Fact]
     public async Task CalculateCostAsync_ShouldCalculateAcrossTariffChanges()
     {
-        // Monday 08:30 to 09:30 
-        // 08:30-09:00 (30 min) -> Tariff 2 (2.80/h) -> 1.40
-        // 09:00-09:30 (30 min) -> Tariff 3 (3.60/h) -> 1.80
-        // Total: 3.20
+        // Montag 08:30 bis 09:30 
+        // 08:30-09:00 (30 Min) -> Tarif 2 (2.80/h) -> 1.40
+        // 09:00-09:30 (30 Min) -> Tarif 3 (3.60/h) -> 1.80
+        // Gesamt: 3.20
         var entry = new DateTime(2026, 5, 4, 8, 30, 0);
         var exit = entry.AddHours(1);
 
@@ -80,8 +77,8 @@ public class TariffServiceTests : IDisposable
     [Fact]
     public async Task CalculateCostAsync_ShouldApplyDailyCap()
     {
-        // Monday 00:00 to 23:59 -> Should be capped at 35.00
-        // Without cap: 6*2.5 + 3*2.8 + 9*3.6 + 3*2.8 + 3*2.4 = 15 + 8.4 + 32.4 + 8.4 + 7.2 = 71.40
+        // Montag 00:00 bis 23:59 -> Sollte bei 35.00 gedeckelt sein
+        // Ohne Deckelung: 6*2.5 + 3*2.8 + 9*3.6 + 3*2.8 + 3*2.4 = 15 + 8.4 + 32.4 + 8.4 + 7.2 = 71.40
         var entry = new DateTime(2026, 5, 4, 0, 0, 0);
         var exit = entry.AddHours(23).AddMinutes(59);
 
@@ -93,7 +90,7 @@ public class TariffServiceTests : IDisposable
     [Fact]
     public async Task CalculateCostAsync_ShouldHandleWeekendTariff()
     {
-        // Sunday 10:00 to 11:00 -> Tariff 7 (3.20/h)
+        // Sonntag 10:00 bis 11:00 -> Tarif 7 (3.20/h)
         var entry = new DateTime(2026, 5, 3, 10, 0, 0);
         var exit = entry.AddHours(1);
 
@@ -105,9 +102,9 @@ public class TariffServiceTests : IDisposable
     [Fact]
     public async Task CalculateCostAsync_ShouldHandleLongTermParking()
     {
-        // More than 24 hours -> 35.00 per day (Ceiling)
+        // Mehr als 24 Stunden -> 35.00 pro Tag (Aufrundung)
         var entry = new DateTime(2026, 5, 4, 10, 0, 0);
-        var exit = entry.AddHours(25); // 1 day and 1 hour -> 2 days charge
+        var exit = entry.AddHours(25); // 1 Tag und 1 Stunde -> Verrechnung von 2 Tagen
 
         var cost = await _service.CalculateCostAsync(entry, exit);
 

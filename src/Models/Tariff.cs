@@ -1,5 +1,3 @@
-using System;
-
 namespace EasyParking.Models;
 
 public class Tariff

@@ -1,5 +1,5 @@
-using Microsoft.EntityFrameworkCore;
 using EasyParking.Models;
+using Microsoft.EntityFrameworkCore;
 
 namespace EasyParking.Services;
 

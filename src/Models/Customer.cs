@@ -1,5 +1,3 @@
-using System.Collections.Generic;
-
 namespace EasyParking.Models;
 
 public class Customer

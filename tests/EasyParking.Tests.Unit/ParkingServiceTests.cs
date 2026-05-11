@@ -1,13 +1,9 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using EasyParking.Models;
 using EasyParking.Services;
 using Microsoft.EntityFrameworkCore;
 using Xunit;
 
-namespace EasyParking.Tests;
+namespace EasyParking.Tests.Unit;
 
 public class ParkingServiceTests : IDisposable
 {
@@ -34,14 +30,14 @@ public class ParkingServiceTests : IDisposable
         var floor2 = new Floor { Id = 2, Number = 2, ParkingGarageId = 1 };
         _context.Floors.AddRange(floor1, floor2);
 
-        // Floor 1: 1 free space
+        // Etage 1: 1 freier Parkplatz
         _context.ParkingSpaces.Add(new ParkingSpace { Id = 1, Number = 101, FloorId = 1, IsOccupied = false });
         
-        // Floor 2: 2 free spaces
+        // Etage 2: 2 freie Parkplätze
         _context.ParkingSpaces.Add(new ParkingSpace { Id = 2, Number = 201, FloorId = 2, IsOccupied = false });
         _context.ParkingSpaces.Add(new ParkingSpace { Id = 3, Number = 202, FloorId = 2, IsOccupied = false });
 
-        // Tenant assigned space
+        // Dem Mieter zugewiesener Parkplatz
         _context.Customers.Add(new Customer { Id = 10, Code = "TENANT_A", CustomerType = CustomerType.Tenant, IsActive = true });
         _context.ParkingSpaces.Add(new ParkingSpace { Id = 4, Number = 301, FloorId = 1, IsOccupied = false, AssignedTenantId = 10 });
 
@@ -51,7 +47,7 @@ public class ParkingServiceTests : IDisposable
     [Fact]
     public async Task AssignFreeSpaceAsync_ShouldChooseFloorWithMostFreeSpaces()
     {
-        // Floor 2 has 2 free spaces, Floor 1 has 1 (excluding tenant space).
+        // Etage 2 hat 2 freie Plätze, Etage 1 hat 1 (ohne Mieterplatz).
         var ticket = await _service.AssignFreeSpaceAsync();
 
         Assert.NotNull(ticket);
@@ -75,7 +71,7 @@ public class ParkingServiceTests : IDisposable
     [Fact]
     public async Task FreeSpaceAsync_ShouldMakeSpaceAvailableAndSetExitTime()
     {
-        // First assign a space
+        // Zuerst einen Platz zuweisen
         var ticket = await _service.AssignFreeSpaceAsync();
         Assert.NotNull(ticket);
         
@@ -95,7 +91,7 @@ public class ParkingServiceTests : IDisposable
     [Fact]
     public async Task AssignFreeSpaceAsync_ShouldReturnNull_WhenGarageIsFull()
     {
-        // Fill all spaces
+        // Alle Plätze belegen
         var spaces = _context.ParkingSpaces.Where(ps => ps.AssignedTenantId == null).ToList();
         foreach (var s in spaces) s.IsOccupied = true;
         await _context.SaveChangesAsync();
